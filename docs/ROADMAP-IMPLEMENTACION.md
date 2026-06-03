@@ -3,7 +3,7 @@
 Desglose del MVP en fases incrementales. Cada fase deja el sistema en un estado
 verificable. El alcance funcional completo está en [PRD.md](./PRD.md).
 
-## Fase 0 — Fundaciones ✅ (en curso)
+## Fase 0 — Fundaciones ✅ (completada)
 
 Base técnica sobre la que se monta todo el MVP.
 
@@ -20,10 +20,10 @@ Base técnica sobre la que se monta todo el MVP.
       (región `eu-central-1`, UE) en el esquema dedicado `conciliacion`,
       aislado de la otra app del proyecto (que vive en `public`).
 - [x] Clientes Supabase apuntando al esquema `conciliacion` por defecto.
-- [ ] **Pendiente (tú):** exponer el esquema `conciliacion` en el panel de
-      Supabase (Settings → API → Exposed schemas) para que PostgREST lo sirva.
-- [ ] **Pendiente:** tras exponerlo, regenerar `src/lib/supabase/types.ts`
-      desde el schema (`generate_typescript_types` / `supabase gen types`).
+- [x] Esquema `conciliacion` expuesto en la API y verificado vía REST
+      (PostgREST responde y RLS bloquea al rol anónimo).
+- [x] `src/lib/supabase/types.ts` con los tipos del esquema `conciliacion`
+      (escritos a mano; el generador del MCP solo emite `public`).
 
 ## Fase 1 — Validadores deterministas
 
