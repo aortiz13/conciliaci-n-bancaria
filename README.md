@@ -31,9 +31,46 @@ Fuera del MVP: emisión de facturas, open banking, ingesta XML, WhatsApp e integ
 | Extracción | Gemini 2.5 multimodal (Vertex AI) |
 | Orquestación async | Inngest |
 
+## Puesta en marcha (desarrollo)
+
+```bash
+# 1. Instalar dependencias
+npm install
+
+# 2. Configurar variables de entorno
+cp .env.example .env.local   # y rellenar las claves de Supabase, etc.
+
+# 3. Aplicar el schema a un proyecto Supabase (región UE)
+#    via Supabase CLI:
+supabase link --project-ref <ref>
+supabase db push
+#    (o aplicar supabase/migrations/*.sql en orden)
+
+# 4. Arrancar la app web
+npm run dev        # http://localhost:3000
+```
+
+Scripts útiles: `npm run build`, `npm run lint`, `npm run typecheck`.
+
+## Estructura
+
+```
+src/
+  app/                 # Next.js App Router (UI del equipo interno)
+  lib/supabase/        # clientes browser / server / admin + middleware + tipos
+  middleware.ts        # refresco de sesión Supabase
+supabase/
+  config.toml          # config del CLI
+  migrations/          # schema, RLS y storage (0001..0004)
+docs/
+  PRD.md               # documento de producto
+  ROADMAP-IMPLEMENTACION.md  # fases de construcción del MVP
+```
+
 ## Documentación
 
 - [PRD completo](docs/PRD.md) — requisitos, arquitectura, schema de BD, compliance, roadmap y criterios de aceptación.
+- [Roadmap de implementación](docs/ROADMAP-IMPLEMENTACION.md) — desglose del MVP por fases.
 
 ## Compliance (resumen)
 

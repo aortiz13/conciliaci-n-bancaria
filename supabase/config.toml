@@ -1,0 +1,17 @@
+# Configuración del proyecto Supabase para el CLI / desarrollo local.
+# El `project_id` se enlaza con `supabase link --project-ref <ref>`.
+project_id = "conciliacion-bancaria"
+
+[db]
+major_version = 17
+
+[db.migrations]
+schema_paths = []
+
+[auth]
+# La app web autentica al equipo interno (admin / operador).
+enable_signup = false
+
+[storage]
+# Buckets privados por tenant para los archivos originales de factura.
+enabled = true
