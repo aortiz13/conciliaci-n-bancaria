@@ -25,15 +25,18 @@ Base técnica sobre la que se monta todo el MVP.
 - [x] `src/lib/supabase/types.ts` con los tipos del esquema `conciliacion`
       (escritos a mano; el generador del MCP solo emite `public`).
 
-## Fase 1 — Validadores deterministas
+## Fase 1 — Validadores deterministas ✅ (completada)
 
-Lógica pura, sin dependencias externas, con tests (RF-12 a RF-15).
+Lógica pura en Python (pydantic), sin dependencias externas, con tests
+(`extraction/`, RF-12 a RF-15). 40 tests en verde.
 
-- [ ] `validate_nif` — checksum NIF/NIE/CIF (mod-23).
-- [ ] `validate_iban` — checksum IBAN (MOD-97).
-- [ ] `validate_vat_arithmetic` — bases, cuotas por tipo, IRPF, total.
-- [ ] `detect_duplicate` — emisor + nº/serie + total + fecha.
-- [ ] `route_invoice` — enrutado por completitud + validaciones + confidence.
+- [x] `validate_nif` — checksum NIF/NIE/CIF (mod-23 + control de CIF).
+- [x] `validate_iban` — checksum IBAN (MOD-97) + longitud por país.
+- [x] `validate_vat_arithmetic` — bases, cuotas por tipo, IRPF, total.
+- [x] `detect_duplicate` — emisor + nº + total + fecha (con `repo` inyectable).
+- [x] `route_invoice` — enrutado por completitud + validaciones + confidence.
+- [ ] **Fase 2:** `extract_invoice` (LLM multimodal) y `InvoiceRepo` real
+      contra Supabase.
 
 ## Fase 2 — Ingesta + extracción
 
