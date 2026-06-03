@@ -14,6 +14,6 @@ export const config = {
      * - favicon y archivos estáticos comunes
      * - rutas de webhooks de ingesta (no llevan sesión de usuario)
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/ingest|api/inngest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/ingest|api/inngest|api/extract|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

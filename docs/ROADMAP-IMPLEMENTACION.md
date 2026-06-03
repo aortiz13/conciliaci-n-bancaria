@@ -38,16 +38,30 @@ Lógica pura en Python (pydantic), sin dependencias externas, con tests
 - [ ] **Fase 2:** `extract_invoice` (LLM multimodal) y `InvoiceRepo` real
       contra Supabase.
 
-## Fase 2 — Ingesta + extracción
+## Fase 2 — Ingesta + extracción ✅ (código completo; faltan claves)
 
-Captura por canal y registro estructurado (RF-1 a RF-11).
+Captura por canal y registro estructurado (RF-1 a RF-11). Código listo,
+leyendo credenciales de entorno (a rellenar en `.env`).
 
-- [ ] Webhook ingest (tenant + proveedor, persistencia en Storage, encolado).
-- [ ] Canal Telegram (grammY) con declaración de IA (RF-9).
-- [ ] Canal email inbound (SendGrid Inbound Parse), alias por tenant.
-- [ ] Cola durable (Inngest) con reintentos idempotentes.
-- [ ] Servicio de extracción (Gemini multimodal) + confidence por campo.
-- [ ] Alta de proveedor provisional en cuarentena por NIF.
+- [x] Webhook ingest (persistencia en Storage + `documents`, encolado a Inngest):
+      `src/lib/ingest/` (documents, tenant, suppliers).
+- [x] Canal Telegram (grammY) con declaración de IA (RF-9):
+      `src/lib/telegram/bot.ts` + `src/app/api/ingest/telegram/route.ts`.
+- [x] Canal email inbound (SendGrid Inbound Parse), alias por tenant:
+      `src/app/api/ingest/email/route.ts`.
+- [x] Cola durable (Inngest) con reintentos idempotentes:
+      `src/lib/inngest/*` + `src/app/api/inngest/route.ts`.
+- [x] Servicio de extracción (Gemini multimodal) + confidence por campo:
+      `extraction/.../extraction.py` + `api/extract.py` (Vercel Python).
+- [x] Pipeline extract→validar→dedupe→enrutar→persistir (`pipeline.py`,
+      `repo.py`) con tests (extractor y repo falsos).
+- [x] Alta de proveedor provisional por NIF (`SupabaseRepo.find_or_create_supplier`).
+- [x] Contador de uso atómico vía RPC `increment_usage` (migración 0006).
+- [ ] **Pendiente (claves):** `TELEGRAM_BOT_TOKEN`, credenciales Vertex AI,
+      `SENDGRID_INBOUND_SECRET`, claves Inngest; registrar el webhook de
+      Telegram y el Inbound Parse de SendGrid.
+- [ ] **Pendiente:** envío de repreguntas/escalado al proveedor por el canal
+      (flujo B, 3 intentos) — la base (estado/excepciones) ya queda escrita.
 
 ## Fase 3 — App web de revisión
 

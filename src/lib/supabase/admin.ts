@@ -1,7 +1,17 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import {
+  createClient as createSupabaseClient,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 
 import { DB_SCHEMA } from "@/lib/supabase/constants";
 import type { Database } from "@/lib/supabase/types";
+
+/** Cliente Supabase tipado contra el esquema `conciliacion`. */
+export type AppSupabaseClient = SupabaseClient<
+  Database,
+  typeof DB_SCHEMA,
+  typeof DB_SCHEMA
+>;
 
 /**
  * Cliente Supabase con `service_role`. SALTA RLS.
