@@ -16,10 +16,14 @@ Base técnica sobre la que se monta todo el MVP.
 - [x] Políticas RLS por membresía de tenant (+ helpers `is_tenant_member` /
       `is_tenant_admin`).
 - [x] Bucket de Storage privado `invoices` con RLS por carpeta de tenant.
-- [ ] **Pendiente:** provisionar proyecto Supabase real en región UE y aplicar
-      migraciones (bloqueado por el límite de 2 proyectos free — requiere
-      liberar un hueco desde el panel).
-- [ ] Regenerar `src/lib/supabase/types.ts` desde el schema aplicado.
+- [x] Migraciones aplicadas al proyecto Supabase `wnohtrqnhubqlantpmff`
+      (región `eu-central-1`, UE) en el esquema dedicado `conciliacion`,
+      aislado de la otra app del proyecto (que vive en `public`).
+- [x] Clientes Supabase apuntando al esquema `conciliacion` por defecto.
+- [ ] **Pendiente (tú):** exponer el esquema `conciliacion` en el panel de
+      Supabase (Settings → API → Exposed schemas) para que PostgREST lo sirva.
+- [ ] **Pendiente:** tras exponerlo, regenerar `src/lib/supabase/types.ts`
+      desde el schema (`generate_typescript_types` / `supabase gen types`).
 
 ## Fase 1 — Validadores deterministas
 

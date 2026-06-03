@@ -6,31 +6,31 @@
 -- ---------------------------------------------------------------------------
 -- Helpers de autorización
 -- ---------------------------------------------------------------------------
-create or replace function public.is_tenant_member(p_tenant_id uuid)
+create or replace function conciliacion.is_tenant_member(p_tenant_id uuid)
 returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = conciliacion, public
 as $$
   select exists (
     select 1
-    from public.memberships m
+    from conciliacion.memberships m
     where m.tenant_id = p_tenant_id
       and m.user_id = auth.uid()
   );
 $$;
 
-create or replace function public.is_tenant_admin(p_tenant_id uuid)
+create or replace function conciliacion.is_tenant_admin(p_tenant_id uuid)
 returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = conciliacion, public
 as $$
   select exists (
     select 1
-    from public.memberships m
+    from conciliacion.memberships m
     where m.tenant_id = p_tenant_id
       and m.user_id = auth.uid()
       and m.role = 'admin'
@@ -40,150 +40,156 @@ $$;
 -- ---------------------------------------------------------------------------
 -- Habilitar RLS en todas las tablas
 -- ---------------------------------------------------------------------------
-alter table public.plans                 enable row level security;
-alter table public.tenants               enable row level security;
-alter table public.users                 enable row level security;
-alter table public.memberships           enable row level security;
-alter table public.suppliers             enable row level security;
-alter table public.channel_identities    enable row level security;
-alter table public.documents             enable row level security;
-alter table public.invoices              enable row level security;
-alter table public.invoice_lines         enable row level security;
-alter table public.invoice_tax_subtotals enable row level security;
-alter table public.bank_statements       enable row level security;
-alter table public.bank_movements        enable row level security;
-alter table public.reconciliation_matches enable row level security;
-alter table public.match_links           enable row level security;
-alter table public.exceptions_queue      enable row level security;
-alter table public.conversations         enable row level security;
-alter table public.messages              enable row level security;
-alter table public.usage_counters        enable row level security;
-alter table public.audit_log             enable row level security;
-alter table public.erp_connections       enable row level security;
+alter table conciliacion.plans                 enable row level security;
+alter table conciliacion.tenants               enable row level security;
+alter table conciliacion.users                 enable row level security;
+alter table conciliacion.memberships           enable row level security;
+alter table conciliacion.suppliers             enable row level security;
+alter table conciliacion.channel_identities    enable row level security;
+alter table conciliacion.documents             enable row level security;
+alter table conciliacion.invoices              enable row level security;
+alter table conciliacion.invoice_lines         enable row level security;
+alter table conciliacion.invoice_tax_subtotals enable row level security;
+alter table conciliacion.bank_statements       enable row level security;
+alter table conciliacion.bank_movements        enable row level security;
+alter table conciliacion.reconciliation_matches enable row level security;
+alter table conciliacion.match_links           enable row level security;
+alter table conciliacion.exceptions_queue      enable row level security;
+alter table conciliacion.conversations         enable row level security;
+alter table conciliacion.messages              enable row level security;
+alter table conciliacion.usage_counters        enable row level security;
+alter table conciliacion.audit_log             enable row level security;
+alter table conciliacion.erp_connections       enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- plans: catálogo de solo lectura para usuarios autenticados
 -- ---------------------------------------------------------------------------
-create policy plans_select on public.plans
+create policy plans_select on conciliacion.plans
   for select to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
 -- tenants: miembros leen; admin actualiza
 -- ---------------------------------------------------------------------------
-create policy tenants_select on public.tenants
-  for select to authenticated using (public.is_tenant_member(id));
-create policy tenants_update on public.tenants
+create policy tenants_select on conciliacion.tenants
+  for select to authenticated using (conciliacion.is_tenant_member(id));
+create policy tenants_update on conciliacion.tenants
   for update to authenticated
-  using (public.is_tenant_admin(id))
-  with check (public.is_tenant_admin(id));
+  using (conciliacion.is_tenant_admin(id))
+  with check (conciliacion.is_tenant_admin(id));
 
 -- ---------------------------------------------------------------------------
 -- users: cada usuario gestiona su propia fila
 -- ---------------------------------------------------------------------------
-create policy users_select on public.users
+create policy users_select on conciliacion.users
   for select to authenticated using (id = auth.uid());
-create policy users_insert on public.users
+create policy users_insert on conciliacion.users
   for insert to authenticated with check (id = auth.uid());
-create policy users_update on public.users
+create policy users_update on conciliacion.users
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
 -- ---------------------------------------------------------------------------
 -- memberships: miembros del tenant leen; admin gestiona
 -- ---------------------------------------------------------------------------
-create policy memberships_select on public.memberships
-  for select to authenticated using (public.is_tenant_member(tenant_id));
-create policy memberships_admin_write on public.memberships
+create policy memberships_select on conciliacion.memberships
+  for select to authenticated using (conciliacion.is_tenant_member(tenant_id));
+create policy memberships_admin_write on conciliacion.memberships
   for all to authenticated
-  using (public.is_tenant_admin(tenant_id))
-  with check (public.is_tenant_admin(tenant_id));
+  using (conciliacion.is_tenant_admin(tenant_id))
+  with check (conciliacion.is_tenant_admin(tenant_id));
 
 -- ---------------------------------------------------------------------------
 -- Tablas operativas: CRUD completo para cualquier miembro (admin u operador)
 -- ---------------------------------------------------------------------------
--- Patrón: USING + WITH CHECK sobre is_tenant_member(tenant_id).
-create policy suppliers_rw on public.suppliers
+create policy suppliers_rw on conciliacion.suppliers
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy channel_identities_rw on public.channel_identities
+create policy channel_identities_rw on conciliacion.channel_identities
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy documents_rw on public.documents
+create policy documents_rw on conciliacion.documents
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy invoices_rw on public.invoices
+create policy invoices_rw on conciliacion.invoices
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy invoice_lines_rw on public.invoice_lines
+create policy invoice_lines_rw on conciliacion.invoice_lines
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy invoice_tax_subtotals_rw on public.invoice_tax_subtotals
+create policy invoice_tax_subtotals_rw on conciliacion.invoice_tax_subtotals
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy bank_statements_rw on public.bank_statements
+create policy bank_statements_rw on conciliacion.bank_statements
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy bank_movements_rw on public.bank_movements
+create policy bank_movements_rw on conciliacion.bank_movements
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy reconciliation_matches_rw on public.reconciliation_matches
+create policy reconciliation_matches_rw on conciliacion.reconciliation_matches
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy match_links_rw on public.match_links
+create policy match_links_rw on conciliacion.match_links
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy exceptions_queue_rw on public.exceptions_queue
+create policy exceptions_queue_rw on conciliacion.exceptions_queue
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy conversations_rw on public.conversations
+create policy conversations_rw on conciliacion.conversations
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
-create policy messages_rw on public.messages
+create policy messages_rw on conciliacion.messages
   for all to authenticated
-  using (public.is_tenant_member(tenant_id))
-  with check (public.is_tenant_member(tenant_id));
+  using (conciliacion.is_tenant_member(tenant_id))
+  with check (conciliacion.is_tenant_member(tenant_id));
 
 -- ---------------------------------------------------------------------------
 -- usage_counters: miembros leen; escritura solo backend (service_role)
 -- ---------------------------------------------------------------------------
-create policy usage_counters_select on public.usage_counters
-  for select to authenticated using (public.is_tenant_member(tenant_id));
+create policy usage_counters_select on conciliacion.usage_counters
+  for select to authenticated using (conciliacion.is_tenant_member(tenant_id));
 
 -- ---------------------------------------------------------------------------
 -- audit_log: miembros leen e insertan (append-only); sin update/delete
 -- ---------------------------------------------------------------------------
-create policy audit_log_select on public.audit_log
-  for select to authenticated using (public.is_tenant_member(tenant_id));
-create policy audit_log_insert on public.audit_log
-  for insert to authenticated with check (public.is_tenant_member(tenant_id));
+create policy audit_log_select on conciliacion.audit_log
+  for select to authenticated using (conciliacion.is_tenant_member(tenant_id));
+create policy audit_log_insert on conciliacion.audit_log
+  for insert to authenticated with check (conciliacion.is_tenant_member(tenant_id));
 
 -- ---------------------------------------------------------------------------
 -- erp_connections: solo admin (contiene credenciales)
 -- ---------------------------------------------------------------------------
-create policy erp_connections_admin on public.erp_connections
+create policy erp_connections_admin on conciliacion.erp_connections
   for all to authenticated
-  using (public.is_tenant_admin(tenant_id))
-  with check (public.is_tenant_admin(tenant_id));
+  using (conciliacion.is_tenant_admin(tenant_id))
+  with check (conciliacion.is_tenant_admin(tenant_id));
+
+-- ---------------------------------------------------------------------------
+-- Grants explícitos (cubre objetos ya creados; RLS sigue gobernando filas)
+-- ---------------------------------------------------------------------------
+grant all on all tables    in schema conciliacion to anon, authenticated, service_role;
+grant all on all sequences in schema conciliacion to anon, authenticated, service_role;
+grant all on all routines  in schema conciliacion to anon, authenticated, service_role;

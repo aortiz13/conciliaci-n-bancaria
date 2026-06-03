@@ -2,8 +2,15 @@
 # El `project_id` se enlaza con `supabase link --project-ref <ref>`.
 project_id = "conciliacion-bancaria"
 
+[api]
+# Esquemas expuestos vía PostgREST. `conciliacion` es el esquema del producto.
+# En el proyecto hosted hay que exponerlo además en el panel:
+# Settings → API → Exposed schemas.
+schemas = ["public", "graphql_public", "conciliacion"]
+extra_search_path = ["public", "extensions"]
+
 [db]
-major_version = 17
+major_version = 15
 
 [db.migrations]
 schema_paths = []

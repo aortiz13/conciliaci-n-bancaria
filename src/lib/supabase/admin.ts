@@ -1,5 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
+import { DB_SCHEMA } from "@/lib/supabase/constants";
 import type { Database } from "@/lib/supabase/types";
 
 /**
@@ -15,10 +16,11 @@ export function createAdminClient() {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY no está configurada");
   }
 
-  return createSupabaseClient<Database>(
+  return createSupabaseClient<Database, typeof DB_SCHEMA>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     serviceRoleKey,
     {
+      db: { schema: DB_SCHEMA },
       auth: {
         autoRefreshToken: false,
         persistSession: false,

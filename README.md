@@ -45,6 +45,9 @@ cp .env.example .env.local   # y rellenar las claves de Supabase, etc.
 supabase link --project-ref <ref>
 supabase db push
 #    (o aplicar supabase/migrations/*.sql en orden)
+#
+#    El producto vive en el esquema dedicado `conciliacion` (aislado de `public`).
+#    Hay que exponerlo en el panel: Settings → API → Exposed schemas → conciliacion.
 
 # 4. Arrancar la app web
 npm run dev        # http://localhost:3000
